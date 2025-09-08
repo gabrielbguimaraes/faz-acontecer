@@ -12,18 +12,36 @@ O objetivo é desenvolver um aplicativo que funcione como um assistente pessoal,
 
 O projeto será desenvolvido seguindo a metodologia ágil **Scrum**, com o trabalho dividido em três **Sprints** (ou ciclos de desenvolvimento).
 
-## MVP (Produto Mínimo Viável)
+### **MVP da Sprint 1: O Núcleo do Aplicativo**
 
-O MVP do "Faz Acontecer" é a sua base funcional, o conjunto de funcionalidades essenciais para que o aplicativo seja utilizável e já resolva o problema central do usuário. O MVP será entregue na **Sprint 1** e inclui:
+O MVP desta fase é a espinha dorsal do aplicativo, com as funcionalidades essenciais para que ele seja utilizável e já resolva o problema central do usuário.
 
-* **Gerenciamento de Tarefas:** Criação, edição e exclusão de tarefas com campos de título, descrição, data e hora.
-* **Alarme Implacável:** Sistema de alarme que persiste até que o usuário interaja com a notificação.
-* **Visão Geral Diária:** Uma tela inicial direta que exibe um resumo das tarefas do dia.
-* **Acesso Rápido e Seguro:** Autenticação biométrica para acesso rápido ao aplicativo.
+* **Gerenciamento de Tarefas:** O usuário consegue criar, editar e excluir tarefas, inserindo título, descrição, data e hora.
+* **Alarme Implacável:** O aplicativo emite um alarme persistente que só para quando o usuário confirma que tomou ciência da tarefa.
+* **Visão Geral Diária:** A tela inicial exibe um resumo claro e direto das tarefas do dia.
+* **Acesso Rápido e Seguro:** O usuário pode utilizar a biometria (impressão digital ou reconhecimento facial) para acessar o aplicativo e confirmar a conclusão de uma atividade.
+
+### **MVP da Sprint 2: Engajamento e Praticidade**
+
+Nesta fase, o MVP foca em tornar o aplicativo mais inteligente e adaptado à rotina do usuário, adicionando recursos que aumentam o engajamento e a praticidade.
+
+* **Lembretes por Localização:** O app usa o **GPS** para notificar o usuário quando ele se aproxima de um local específico para uma tarefa.
+* **Prioridade de Tarefas:** O usuário consegue categorizar as tarefas por prioridade (urgente, importante ou opcional).
+* **Notificações em Destaque:** Notificações visuais em tela cheia que bloqueiam parcialmente o celular até que o usuário interaja com a tarefa.
+* **Tarefas Recorrentes:** O usuário pode configurar tarefas que se repetem diariamente, semanalmente ou em intervalos personalizados.
+
+### **MVP da Sprint 3: Funcionalidades Avançadas e Polimento**
+
+O MVP final desta sprint é focado em entregar os diferenciais que tornam a experiência do usuário mais completa, inteligente e segura.
+
+* **Sincronia com o Calendário:** O aplicativo sincroniza as atividades com o calendário nativo do dispositivo.
+* **Anexos de Mídia:** O usuário pode anexar imagens, documentos ou áudios às tarefas para enriquecer os detalhes.
+* **Monitoramento de Produtividade:** O app oferece relatórios semanais ou mensais sobre tarefas concluídas, atrasadas ou ignoradas.
+* **Backup Automático:** O sistema salva o histórico e as pendências em um backup automático na nuvem.
+* **Personalização de Tema:** O usuário pode personalizar temas e cores da interface para uma experiência mais agradável.
 
 ## Product Backlog e Sprints
 
-Abaixo, a lista de histórias de usuário e seus respectivos *Story Points* (estimativa de esforço) distribuídos por Sprints.
 
 ### **Sprint 1**
 
@@ -34,7 +52,7 @@ Abaixo, a lista de histórias de usuário e seus respectivos *Story Points* (est
 | Visão Geral Diária | Como usuário, eu quero ver um resumo do dia na tela inicial para saber rapidamente o que preciso fazer. | 3 |
 | Acesso Rápido e Seguro | Como usuário, eu quero desbloquear o app com biometria para ter acesso rápido e seguro. | 3 |
 
-**Total da Sprint:** 16 Story Points
+
 
 ### **Sprint 2**
 
@@ -45,7 +63,6 @@ Abaixo, a lista de histórias de usuário e seus respectivos *Story Points* (est
 | Notificações em Destaque | Como usuário, eu quero notificações em tela cheia para que uma tarefa importante não passe despercebida. | 3 |
 | Rotina Sem Esforço | Como usuário, eu quero configurar tarefas recorrentes para não precisar recriá-las manualmente. | 3 |
 
-**Total da Sprint:** 13 Story Points
 
 ### **Sprint 3**
 
@@ -58,4 +75,3 @@ Abaixo, a lista de histórias de usuário e seus respectivos *Story Points* (est
 | Personalização de Tema | Como usuário, eu quero poder personalizar as cores e o tema do aplicativo para que a experiência seja mais agradável. | 2 |
 | Descanso Garantido | Como usuário, eu quero que o app tenha um modo noturno para não ser incomodado e reorganizar os lembretes para o dia seguinte. | 3 |
 
-**Total da Sprint:** 20 Story Points
