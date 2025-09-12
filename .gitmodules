@@ -1,0 +1,6 @@
+[submodule "faz-acontecer-backend"]
+	path = faz-acontecer-backend
+	url = https://github.com/gabrielbguimaraes/faz-acontecer-backend.git
+[submodule "faz-acontecer-frontend"]
+	path = faz-acontecer-frontend
+	url = https://github.com/gabrielbguimaraes/faz-acontecer-frontend.git
