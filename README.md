@@ -4,7 +4,6 @@
 
 O "Faz Acontecer" é um aplicativo de gerenciamento de tarefas que vai além de um simples checklist. Seu conceito central é focado em resolver um problema comum: a falta de engajamento e a facilidade em ignorar tarefas pendentes. A solução proposta é utilizar recursos tecnológicos de forma proativa, como **alarmes persistentes**, **notificações inteligentes**, **biometria** e **geolocalização**, para garantir que o usuário se mantenha disciplinado e no controle de suas atividades diárias.
 
-O projeto foi aprovado com base em um documento de requisitos com 20 funcionalidades principais. [cite_start]As tecnologias sugeridas incluem React Native, Android Studio, entre outras[cite: 6, 7].
 
 ## Escopo do Projeto
 
