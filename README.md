@@ -9,21 +9,6 @@ O "Faz Acontecer" é um aplicativo de gerenciamento de tarefas que vai além de 
 
 ---
 
-### Arquitetura do Sistema
-
-A arquitetura do projeto é baseada em camadas para garantir a separação de responsabilidades e a manutenibilidade do código. A imagem abaixo detalha a estrutura do aplicativo e a sua comunicação com os serviços externos.
-
-![Diagrama de Arquitetura](mgt/architecture.png)
-
----
-
-### Modelo de Dados
-
-O modelo de dados conceitual do projeto foi criado para garantir a integridade e a organização das informações, como tarefas, usuários, anexos e estatísticas.
-
-![Modelo de Dados](mgt/faz-acontecer-bd.png)
-
----
 
 ## Escopo do Projeto
 
