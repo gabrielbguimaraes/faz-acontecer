@@ -1,9 +1,29 @@
 # Projeto "Faz Acontecer"
 
+## Logo do Projeto
+![Logo do Projeto](mgt/faz-acontecer-logo.png)
+
 ## Visão Geral
 
 O "Faz Acontecer" é um aplicativo de gerenciamento de tarefas que vai além de um simples checklist. Seu conceito central é focado em resolver um problema comum: a falta de engajamento e a facilidade em ignorar tarefas pendentes. A solução proposta é utilizar recursos tecnológicos de forma proativa, como **alarmes persistentes**, **notificações inteligentes**, **biometria** e **geolocalização**, para garantir que o usuário se mantenha disciplinado e no controle de suas atividades diárias.
 
+---
+
+### Arquitetura do Sistema
+
+A arquitetura do projeto é baseada em camadas para garantir a separação de responsabilidades e a manutenibilidade do código. A imagem abaixo detalha a estrutura do aplicativo e a sua comunicação com os serviços externos.
+
+![Diagrama de Arquitetura](mgt/architecture.png)
+
+---
+
+### Modelo de Dados
+
+O modelo de dados conceitual do projeto foi criado para garantir a integridade e a organização das informações, como tarefas, usuários, anexos e estatísticas.
+
+![Modelo de Dados](mgt/faz-acontecer-bd.png)
+
+---
 
 ## Escopo do Projeto
 
@@ -39,8 +59,9 @@ O MVP final desta sprint é focado em entregar os diferenciais que tornam a expe
 * **Backup Automático:** O sistema salva o histórico e as pendências em um backup automático na nuvem.
 * **Personalização de Tema:** O usuário pode personalizar temas e cores da interface para uma experiência mais agradável.
 
-## Product Backlog e Sprints
+---
 
+## Product Backlog e Sprints
 
 ### **Sprint 1**
 
@@ -51,7 +72,7 @@ O MVP final desta sprint é focado em entregar os diferenciais que tornam a expe
 | Visão Geral Diária | Como usuário, eu quero ver um resumo do dia na tela inicial para saber rapidamente o que preciso fazer. | 3 |
 | Acesso Rápido e Seguro | Como usuário, eu quero desbloquear o app com biometria para ter acesso rápido e seguro. | 3 |
 
-
+---
 
 ### **Sprint 2**
 
@@ -62,6 +83,7 @@ O MVP final desta sprint é focado em entregar os diferenciais que tornam a expe
 | Notificações em Destaque | Como usuário, eu quero notificações em tela cheia para que uma tarefa importante não passe despercebida. | 3 |
 | Rotina Sem Esforço | Como usuário, eu quero configurar tarefas recorrentes para não precisar recriá-las manualmente. | 3 |
 
+---
 
 ### **Sprint 3**
 
@@ -73,4 +95,3 @@ O MVP final desta sprint é focado em entregar os diferenciais que tornam a expe
 | Gamificação de Tarefas | Como usuário, eu quero ganhar recompensas simbólicas, como medalhas, para me sentir motivado a ser disciplinado. | 2 |
 | Personalização de Tema | Como usuário, eu quero poder personalizar as cores e o tema do aplicativo para que a experiência seja mais agradável. | 2 |
 | Descanso Garantido | Como usuário, eu quero que o app tenha um modo noturno para não ser incomodado e reorganizar os lembretes para o dia seguinte. | 3 |
-
