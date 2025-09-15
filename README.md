@@ -1,6 +1,5 @@
 # Projeto "Faz Acontecer"
 
-## Logo do Projeto
 
 ![Logo do Projeto](mgt/faz-acontecer-logo.png)
 
