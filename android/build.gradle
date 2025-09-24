@@ -1,10 +1,12 @@
+// FazAcontecer/android/build.gradle
+
 buildscript {
     ext {
         buildToolsVersion = "36.0.0"
         minSdkVersion = 24
         compileSdkVersion = 36
         targetSdkVersion = 36
-        ndkVersion = "27.1.12297006"
+        ndkVersion = "29.0.14033849"
         kotlinVersion = "2.1.20"
     }
     repositories {
@@ -15,7 +17,11 @@ buildscript {
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        classpath("com.google.gms:google-services:4.4.3")
     }
 }
+
+// O bloco plugins {} não deve existir neste arquivo para o seu caso.
+// Mantenha apenas a configuração acima.
 
 apply plugin: "com.facebook.react.rootproject"
