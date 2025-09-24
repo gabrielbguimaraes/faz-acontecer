@@ -1,1 +1,3 @@
-// Export theme configuration
+
+export * from './colors';
+export * from './spacing';

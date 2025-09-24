@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "492310986496",
+    "project_id": "faz-acontecer-f23cc",
+    "storage_bucket": "faz-acontecer-f23cc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492310986496:android:07535b9c3dbadcd210bde5",
+        "android_client_info": {
+          "package_name": "com.fazacontecer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2mQim5_9WcDfROh1uV8Yo_hoQOnbq8O0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

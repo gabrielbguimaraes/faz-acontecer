@@ -1,3 +1,0 @@
-# screens
-
-Screen-specific components
