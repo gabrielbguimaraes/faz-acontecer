@@ -38,10 +38,10 @@ export const styles = StyleSheet.create({
         fontWeight: '600',
     },
     primaryText: {
-        color: colors.white,
+        color: colors.textLight,
     },
     secondaryText: {
-        color: colors.white,
+        color: colors.textLight,
     },
     outlineText: {
         color: colors.primary,

@@ -1,12 +1,13 @@
+// FazAcontecer/App.tsx
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { LoginScreen } from './src/screens/LoginScreen';
+import { AppNavigator } from './src/navigation/AppNavigator';
+
+// IMPORTANTE: Se você usava o LoginScreen diretamente aqui, remova.
+// Agora o AppNavigator é o componente principal.
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <LoginScreen />
-    </NavigationContainer>
+    <AppNavigator />
   );
 };
 

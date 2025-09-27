@@ -1,5 +1,12 @@
 {
   "extends": "@react-native/typescript-config",
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["**/node_modules", "**/Pods"]
+  "compilerOptions": {
+    "esModuleInterop": true,         // Corrige erros de importação (ex: import React from 'react')
+    "jsx": "react-native",           // Corrige o erro de JSX em arquivos .ts/.tsx
+    "skipLibCheck": true,            // Ajuda a ignorar erros de tipagem em bibliotecas nativas
+    "allowSyntheticDefaultImports": true, // Ajuda na importação de módulos
+    "strict": true,
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["**/node_modules", "**/Pods"]
+  }
 }
