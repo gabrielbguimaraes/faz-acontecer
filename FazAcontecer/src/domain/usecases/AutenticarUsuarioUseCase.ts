@@ -1,4 +1,5 @@
-// FazAcontecer/src/domain/usecases/AutenticarUsuarioUseCase.ts
+// FazAcontecer/src/domain/usecases/AutenticarUsuarioUseCase.ts (Ajustado)
+
 import { UserRepository } from '../../data/repositories/UserRepository';
 
 export class AutenticarUsuarioUseCase {
@@ -12,8 +13,15 @@ export class AutenticarUsuarioUseCase {
         if (!email || !password) {
             throw new Error('E-mail e senha são obrigatórios.');
         }
+        
+        // Exemplo de Lógica de Domínio: Verificação de formato básico
+        if (!email.includes('@') || !email.includes('.')) {
+            throw new Error('Formato de e-mail inválido.');
+        }
 
-        // Aqui, a lógica de negócio chama o repositório.
+        // Chama a camada de dados para realizar o login
         await this.userRepository.login(email, password);
+        
+        // Se chegar aqui, o login foi bem-sucedido.
     }
 }

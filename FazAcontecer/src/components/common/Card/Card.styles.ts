@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing } from '../../theme';
+import { colors, spacing } from '../../../theme';
 
 export const styles = StyleSheet.create({
     card: {
@@ -8,8 +8,8 @@ export const styles = StyleSheet.create({
         margin: spacing.sm,
     },
     elevated: {
-        backgroundColor: colors.white,
-        shadowColor: colors.black,
+        backgroundColor: colors.textLight,
+        shadowColor: colors.textDark,
         shadowOffset: {
             width: 0,
             height: 2,
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
         elevation: 5,
     },
     outlined: {
-        backgroundColor: colors.white,
+        backgroundColor: colors.textLight,
         borderWidth: 1,
         borderColor: colors.primary,
     },
@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '600',
         marginBottom: spacing.sm,
-        color: colors.text,
+        color: colors.textSecondary,
     },
     content: {
         flex: 1,
