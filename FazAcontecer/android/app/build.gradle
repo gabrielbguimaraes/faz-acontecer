@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.facebook.react'
-    id 'com.google.gms.google-services' // Adicione o plugin do Firebase aqui
+    id 'com.google.gms.google-services'
 }
 
 /**
@@ -81,3 +81,4 @@ dependencies {
         implementation jscFlavor
     }
 }
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

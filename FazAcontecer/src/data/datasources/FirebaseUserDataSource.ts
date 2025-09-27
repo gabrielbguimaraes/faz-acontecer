@@ -1,19 +1,29 @@
-import { UserRepository } from '../repositories/UserRepository';
-import auth from '@react-native-firebase/auth';
+// FazAcontecer/src/data/datasources/FirebaseUserDataSource.ts
 
+import auth from '@react-native-firebase/auth';
+import { Usuario } from '../../domain/entities/usuario';
+import { UserRepository } from '../repositories/UserRepository';
+
+// EXPORTANDO A CLASSE CORRETA
 export class FirebaseUserDataSource implements UserRepository {
-    async login(email: string, password: string): Promise<void> {
-        try {
-            await auth().signInWithEmailAndPassword(email, password);
-        } catch (error) {
-            // Personalize as mensagens de erro para o usuário
-            if (error instanceof Error && error.message.includes('auth/wrong-password')) {
-                throw new Error('E-mail ou senha incorretos.');
-            }
-            if (error instanceof Error && error.message.includes('auth/invalid-email')) {
-                throw new Error('Formato de e-mail inválido.');
-            }
-            throw new Error('Ocorreu um erro ao tentar fazer login. Tente novamente.');
-        }
+  async login(email: string, pass: string): Promise<Usuario | null> {
+    try {
+      const response = await auth().signInWithEmailAndPassword(email, pass);
+      const user = response.user;
+
+      return {
+        id_usuario: user.uid,
+        email: user.email!,
+        nome: user.displayName || 'Usuário',
+      };
+    } catch (error) {
+      console.error("Firebase Login Error: ", error);
+      // Retorna nulo para indicar que o login falhou
+      return null;
     }
+  }
+
+  async logout(): Promise<void> {
+    await auth().signOut();
+  }
 }

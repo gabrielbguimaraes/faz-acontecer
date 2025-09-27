@@ -1,105 +1,95 @@
 // FazAcontecer/src/screens/LoginScreen.tsx
 
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, Image, TouchableOpacity } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack'; 
-import { RootStackParamList } from '../navigation/AppNavigator'; 
+import { View, TextInput, StyleSheet, Alert, Image, TouchableOpacity, Text } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { Button } from '../components/common/Button';
 import { colors, spacing } from '../theme';
 import { useForm } from '../hooks/useForm';
-import { AutenticarUsuarioUseCase } from '../domain/usecases/AutenticarUsuarioUseCase';
-import { MockUserDataSource } from '../data/datasources/MockUserDataSource'; 
-import { enableScreens } from 'react-native-screens';
 
-// Assumindo que a logo está em src/assets/images/
+import { FirebaseUserDataSource } from '../data/datasources/FirebaseUserDataSource';
+import { AutenticarUsuarioUseCase } from '../domain/usecases/AutenticarUsuarioUseCase';
+
+const userDataSource = new FirebaseUserDataSource();
+const autenticarUsuarioUseCase = new AutenticarUsuarioUseCase(userDataSource);
+
 const Logo = require('../assets/images/logo_faz_acontecer_transparente2.png');
 
-enableScreens();
-
-// ----------------------------------------------------------------------
-// 1. Tipagem (Interface)
-// ----------------------------------------------------------------------
-// A interface herda as props nativas. Não precisa incluir onLoginSuccess aqui.
 type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-// ----------------------------------------------------------------------
-// 2. Configuração da Arquitetura (Injeção de Dependências - MOCK)
-// ----------------------------------------------------------------------
-const mockUserDataSource = new MockUserDataSource();
-const autenticarUsuarioUseCase = new AutenticarUsuarioUseCase(mockUserDataSource);
+// CORREÇÃO: Removida a dependência de 'route.params'
+export const LoginScreen: React.FC<LoginScreenProps> = () => {
+  const { values, handleChange } = useForm({
+    email: '',
+    password: '',
+  });
 
+  const handleLogin = async () => {
+    if (!values.email || !values.password) {
+      Alert.alert('Campos Vazios', 'Por favor, preencha e-mail e senha.');
+      return;
+    }
+    try {
+      const usuario = await autenticarUsuarioUseCase.execute(values.email, values.password);
+      
+      // CORREÇÃO: Removida a chamada 'onLoginSuccess()'. O AppNavigator cuidará da transição.
+      if (!usuario) {
+        Alert.alert('Erro de Login', 'E-mail ou senha inválidos.');
+      }
+    } catch (error) {
+      Alert.alert('Erro Inesperado', 'Ocorreu um erro ao tentar fazer login.');
+      console.error(error);
+    }
+  };
 
-export const LoginScreen = ({ navigation, route }: LoginScreenProps) => { 
-    // CORREÇÃO AQUI: A função é extraída de route.params, como um parâmetro da rota.
-    // Usamos o 'as () => void' para dizer ao TypeScript o tipo da função que esperamos.
-    const onLoginSuccess = route.params?.onLoginSuccess as () => void; 
-    
-    // Usando o hook de formulário
-    const { values, handleChange } = useForm({
-        email: '',
-        password: '',
-    });
-
-    const handleLogin = async () => {
-        try {
-            await autenticarUsuarioUseCase.execute(values.email, values.password);
-            
-            // 3. Ação: Se o login for bem-sucedido, chama a função que altera o estado no AppNavigator
-            if (onLoginSuccess) {
-                onLoginSuccess();
-            } else {
-                // Se a navegação falhar, voltamos para o Home (como fallback)
-                navigation.navigate('Home'); 
-            }
-        } catch (error) {
-            Alert.alert('Erro', (error as Error).message);
-        }
-    };
-
-    return (
-        <View style={styles.container}>
-            
-            <Image source={Logo} style={styles.logo} resizeMode="contain" />
-            
-            <View style={styles.formContainer}>
-                {/* Input E-mail e Senha */}
-                <TextInput style={styles.input} placeholder="E-mail" placeholderTextColor={colors.textSecondary} value={values.email} onChangeText={text => handleChange('email', text)} autoCapitalize="none" />
-                <TextInput style={styles.input} placeholder="Senha" placeholderTextColor={colors.textSecondary} value={values.password} onChangeText={text => handleChange('password', text)} secureTextEntry />
-                
-                <Button title="Login" onPress={handleLogin} variant="primary" size="large" />
-
-                <TouchableOpacity onPress={() => Alert.alert('Funcionalidade futura', 'Ainda será implementada.')}>
-                    <Text style={styles.forgotPasswordText}>
-                        Esqueceu sua senha?
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            <Text style={styles.footerText}>
-                Powered by FATEC
-            </Text>
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <Image source={Logo} style={styles.logo} resizeMode="contain" />
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          placeholderTextColor={colors.textSecondary}
+          value={values.email}
+          onChangeText={text => handleChange('email', text)}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor={colors.textSecondary}
+          value={values.password}
+          onChangeText={text => handleChange('password', text)}
+          secureTextEntry
+        />
+        <Button title="Login" onPress={handleLogin} variant="primary" size="large" />
+        <TouchableOpacity onPress={() => Alert.alert('Funcionalidade futura', 'Ainda será implementada.')}>
+          <Text style={styles.forgotPasswordText}>
+            Esqueceu sua senha?
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.footerText}>
+        Powered by FATEC
+      </Text>
+    </View>
+  );
 };
 
-// ... (Restante dos estilos StyleSheet.create)
+// ... (Seus estilos continuam os mesmos)
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.backgroundDark, // Fundo Escuro do tema
+        backgroundColor: colors.backgroundDark,
         alignItems: 'center',
-        paddingTop: spacing.xl * 2, // Espaçamento para o topo
+        justifyContent: 'center',
     },
     logo: {
         width: 150,
         height: 150,
-        marginBottom: spacing.sm,
-    },
-    appName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colors.textLight, // Texto Claro no topo
-        marginBottom: spacing.xl * 2,
+        marginBottom: spacing.lg,
     },
     formContainer: {
         width: '80%',
@@ -108,21 +98,22 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         height: 50,
-        backgroundColor: colors.surface, // Cinza claro (D9D9D9) para o fundo dos inputs
+        backgroundColor: colors.surface,
         paddingHorizontal: spacing.md,
         borderRadius: 8,
         marginBottom: spacing.md,
-        color: colors.textDark, // Texto Escuro para a digitação
+        color: colors.textDark,
+        fontSize: 16,
     },
     forgotPasswordText: {
         marginTop: spacing.md,
         fontSize: 14,
-        color: colors.textSecondary, // Texto Cinza/Claro suave
-        fontStyle: 'italic', // Adiciona o Itálico
+        color: colors.textSecondary,
+        fontStyle: 'italic',
     },
     footerText: {
         position: 'absolute',
-        bottom: spacing.sm,
+        bottom: spacing.lg,
         fontSize: 12,
         color: colors.textSecondary,
     }
