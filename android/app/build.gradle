@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.facebook.react'
-    id 'com.google.gms.google-services' // Adicione o plugin do Firebase aqui
+    id 'com.google.gms.google-services'
 }
 
 /**
@@ -20,14 +20,6 @@ def enableProguardInReleaseBuilds = false
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
- *
- * For example, to use the international variant, you can use:
- * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
- *
- * The international variant includes ICU i18n library and necessary data
- * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
- * give correct results when using with locales other than en-US. Note that
- * this variant is about 6MiB larger per architecture than default.
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
@@ -44,6 +36,9 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    // --- CORREÇÃO APLICADA AQUI ---
+    // Bloco de configuração de assinaturas.
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -51,7 +46,18 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        // Configuração para a versão de lançamento (release)
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
     }
+    // --- FIM DA CORREÇÃO ---
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -59,7 +65,12 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+
+            // --- CORREÇÃO APLICADA AQUI ---
+            // Aponta para a nossa nova configuração de assinatura de release
+            signingConfig signingConfigs.release
+            // --- FIM DA CORREÇÃO ---
+            
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -81,3 +92,4 @@ dependencies {
         implementation jscFlavor
     }
 }
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

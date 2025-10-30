@@ -1,83 +1,36 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors, spacing } from '../../../theme';
+// FazAcontecer/src/components/common/Button/Button.tsx
 
-interface ButtonProps {
-    title: string;
-    onPress: () => void;
-    variant?: 'primary' | 'secondary' | 'outline';
-    size?: 'small' | 'medium' | 'large';
-    disabled?: boolean;
+import React from 'react';
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { getButtonStyles } from './Button.styles';
+
+export interface ButtonProps {
+  title: string;
+  onPress: () => void;
+  // CORREÇÃO: Adicionada a variante 'danger'
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  size?: 'small' | 'medium' | 'large';
+  disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-    title,
-    onPress,
-    variant = 'primary',
-    size = 'medium',
-    disabled = false,
+  title,
+  onPress,
+  variant = 'primary',
+  size = 'medium',
+  disabled = false,
+  isLoading = false,
 }) => {
-    return (
-        <TouchableOpacity
-            style={[
-                styles.button,
-                styles[variant],
-                styles[size],
-                disabled && styles.disabled,
-            ]}
-            onPress={onPress}
-            disabled={disabled}
-        >
-            <Text style={[styles.text, styles[`${variant}Text`]]}>
-                {title}
-            </Text>
-        </TouchableOpacity>
-    );
-};
+  const styles = getButtonStyles(variant, size, disabled || isLoading);
 
-const styles = StyleSheet.create({
-    button: {
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    primary: {
-        backgroundColor: colors.primary,
-    },
-    secondary: {
-        backgroundColor: colors.secondary,
-    },
-    outline: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: colors.primary,
-    },
-    small: {
-        paddingVertical: spacing.xs,
-        paddingHorizontal: spacing.sm,
-    },
-    medium: {
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.md,
-    },
-    large: {
-        paddingVertical: spacing.md,
-        paddingHorizontal: spacing.lg,
-    },
-    disabled: {
-        opacity: 0.5,
-    },
-    text: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    primaryText: {
-        color: colors.white,
-    },
-    secondaryText: {
-        color: colors.white,
-    },
-    outlineText: {
-        color: colors.primary,
-    },
-});
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress} disabled={disabled || isLoading}>
+      {isLoading ? (
+        <ActivityIndicator color={styles.text.color as string} />
+      ) : (
+        <Text style={styles.text}>{title}</Text>
+      )}
+    </TouchableOpacity>
+  );
+};

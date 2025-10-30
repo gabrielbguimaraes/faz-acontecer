@@ -1,27 +1,28 @@
-// FazAcontecer/src/domain/usecases/AutenticarUsuarioUseCase.ts (Ajustado)
+// FazAcontecer/src/domain/usecases/AutenticarUsuarioUseCase.ts
 
 import { UserRepository } from '../../data/repositories/UserRepository';
+import { Usuario } from '../entities/usuario';
 
 export class AutenticarUsuarioUseCase {
-    private userRepository: UserRepository;
+    constructor(private userRepository: UserRepository) {}
 
-    constructor(userRepository: UserRepository) {
-        this.userRepository = userRepository;
-    }
-
-    async execute(email: string, password: string): Promise<void> {
-        if (!email || !password) {
+    /**
+     * Executa a autenticação do usuário.
+     * @param email O e-mail do usuário.
+     * @param pass A senha do usuário.
+     * @returns Uma Promise que resolve com o objeto Usuario em caso de sucesso, ou null em caso de falha.
+     */
+    async execute(email: string, pass: string): Promise<Usuario | null> {
+        if (!email || !pass) {
             throw new Error('E-mail e senha são obrigatórios.');
         }
-        
-        // Exemplo de Lógica de Domínio: Verificação de formato básico
+
         if (!email.includes('@') || !email.includes('.')) {
             throw new Error('Formato de e-mail inválido.');
         }
 
-        // Chama a camada de dados para realizar o login
-        await this.userRepository.login(email, password);
-        
-        // Se chegar aqui, o login foi bem-sucedido.
+        // A camada de dados (Repository) é quem faz o login e retorna o usuário ou nulo.
+        // O UseCase simplesmente repassa essa informação para a tela.
+        return this.userRepository.login(email, pass);
     }
 }
