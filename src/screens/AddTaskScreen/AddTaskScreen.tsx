@@ -25,33 +25,28 @@ type Prioridade = Tarefa['prioridade'];
 type AddTaskScreenProps = NativeStackScreenProps<RootStackParamList, 'AddTask'>;
 
 async function scheduleNotification(tarefa: Tarefa) {
-  try {
-    await notifee.requestPermission();
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: tarefa.data_execucao.getTime(),
-    };
+  await notifee.requestPermission();
+  const trigger: TimestampTrigger = {
+    type: TriggerType.TIMESTAMP,
+    timestamp: tarefa.data_execucao.getTime(),
+  };
 
-    await notifee.createTriggerNotification(
-      {
-        title: `Hora da Tarefa: ${tarefa.titulo}`,
-        body: tarefa.descricao || 'Está na hora de fazer acontecer!',
-        android: {
-          channelId: 'implacable_alarm',
-          importance: AndroidImportance.HIGH,
-          sound: 'alarm',
-          loopSound: true,
-          fullScreenAction: { id: 'default' },
-          actions: [{ title: 'Confirmar (Parar Alarme)', pressAction: { id: 'confirm' } }],
-        },
-      },
-      trigger,
-    );
-    console.log('[Notifee] Alarme agendado com sucesso para:', new Date(trigger.timestamp));
-  } catch (error) {
-    console.error('[Notifee] Erro ao agendar:', error);
-    Alert.alert('Erro no Alarme', 'A tarefa foi salva, mas não foi possível agendar o alarme.');
-  }
+  await notifee.createTriggerNotification(
+    {
+      title: `Hora da Tarefa: ${tarefa.titulo}`,
+      body: tarefa.descricao || 'Está na hora de fazer acontecer!',
+      android: {
+        channelId: 'implacable_alarm',
+        importance: AndroidImportance.HIGH,
+        sound: 'alarm',
+        loopSound: true,
+        fullScreenAction: { id: 'default' },
+        actions: [{ title: 'Confirmar (Parar Alarme)', pressAction: { id: 'confirm' } }],
+      },
+    },
+    trigger,
+  );
+  console.log('[Notifee] Alarme agendado com sucesso para:', new Date(trigger.timestamp));
 }
 
 export const AddTaskScreen: React.FC<AddTaskScreenProps> = ({ navigation }) => {
@@ -83,44 +78,56 @@ export const AddTaskScreen: React.FC<AddTaskScreenProps> = ({ navigation }) => {
   };
 
   const handleAddTask = async () => {
-    if (!values.titulo) {
-      Alert.alert('Campo Obrigatório', 'Por favor, insira um título para a tarefa.');
-      return;
-    }
-    const currentUser = auth().currentUser;
-    if (!currentUser) {
-      Alert.alert('Erro', 'Você precisa estar logado para criar uma tarefa.');
-      return;
-    }
+    if (!values.titulo) {
+      Alert.alert('Campo Obrigatório', 'Por favor, insira um título para a tarefa.');
+      return;
+    }
+    const currentUser = auth().currentUser;
+    if (!currentUser) {
+      Alert.alert('Erro', 'Você precisa estar logado para criar uma tarefa.');
+      return;
+    }
 
-    try {
-      const novaTarefa: Partial<Tarefa> = {
-        id_usuario: currentUser.uid,
-        titulo: values.titulo,
-        descricao: values.descricao,
-        data_execucao: date,
-        hora_execucao: date,
-        concluida: false,
-        status: 'pendente',
-        prioridade: prioridade,
-        recorrencia: recorrencia,
-        localizacao: localizacao, // <-- Salva a localização
-      };
+    try {
+      // 1. Cria o objeto base da tarefa
+      const novaTarefa: Partial<Tarefa> = {
+        id_usuario: currentUser.uid,
+        titulo: values.titulo,
+        descricao: values.descricao,
+        data_execucao: date,
+        hora_execucao: date,
+        concluida: false,
+        status: 'pendente',
+        prioridade: prioridade,
+        recorrencia: recorrencia,
+      };
 
-      const tarefaCompleta = await criarTarefaUseCase.execute(novaTarefa);
-      
-      Alert.alert('Sucesso!', 'Sua tarefa foi criada.');
-      navigation.goBack(); 
-
-      if (tarefaCompleta.recorrencia === 'nao_repete') {
-        await scheduleNotification(tarefaCompleta);
+      // 2. [CORREÇÃO DO ERRO 'undefined'] 
+      // Adiciona a localização APENAS se ela existir (não for null ou undefined)
+      if (localizacao) {
+        novaTarefa.localizacao = localizacao;
       }
 
-    } catch (error) {
-      console.error("[handleAddTask] Erro ao salvar:", error);
-      Alert.alert('Erro ao Salvar', (error as Error).message);
-    }
-  };
+      // 3. [MUDANÇA DE LÓGICA] Tenta salvar a tarefa no banco
+      const tarefaCompleta = await criarTarefaUseCase.execute(novaTarefa);
+      
+      // 4. [MUDANÇA DE LÓGICA] Tenta agendar o alarme
+      if (tarefaCompleta.recorrencia === 'nao_repete') {
+        // (Isso assume que 'scheduleNotification' está sem try/catch)
+        await scheduleNotification(tarefaCompleta); 
+      }
+
+      // 5. [MUDANÇA DE LÓGICA] Se TUDO (passo 3 e 4) deu certo,
+      // mostre sucesso e volte
+      Alert.alert('Sucesso!', 'Tarefa criada e alarme agendado!');
+      navigation.goBack(); 
+
+    } catch (error) {
+      // 6. [MUDANÇA DE LÓGICA] Se qualquer passo (3 ou 4) falhar, caia aqui
+      console.error("[handleAddTask] Erro ao salvar ou agendar:", error);
+      Alert.alert('Erro', `Não foi possível salvar: ${(error as Error).message}`);
+    }
+  };
   
   // NOVO: Função para abrir o mapa
   const handleOpenMap = () => {
