@@ -6,17 +6,23 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import auth from '@react-native-firebase/auth';
 
 import { LoginScreen } from '../screens/LoginScreen';
-import { AddTaskScreen } from '../screens/AddTaskScreen/AddTaskScreen';
-import { TabNavigator } from './TabNavigator';
+import { SignUpScreen } from '../screens/SignUpScreen/SignUpScreen';
 import { AuthLoadingScreen } from '../screens/AuthLoadingScreen';
-import { SignUpScreen } from '../screens/SignUpScreen/SignUpScreen'; // Importa a nova tela
+import { TabNavigator } from './TabNavigator';
+import { AddTaskScreen } from '../screens/AddTaskScreen/AddTaskScreen';
+import { MapPickerScreen } from '../screens/MapPickerScreen/MapPickerScreen'; // <-- 1. IMPORTE A TELA
+import { Localizacao } from '../domain/entities/tarefa'; // <-- 2. IMPORTE O TIPO
 
 export type RootStackParamList = {
   Login: undefined;
-  SignUp: undefined; // Adiciona a rota de cadastro
+  SignUp: undefined; 
+  AuthLoading: { onAuthSuccess: () => void };
   Main: undefined;
   AddTask: undefined;
-  AuthLoading: { onAuthSuccess: () => void };
+  // --- 3. ADICIONE A ROTA E SEUS PARÂMETROS ---
+  MapPicker: {
+    onLocationSelect: (location: Localizacao) => void;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -39,27 +45,25 @@ export const AppNavigator = () => {
     setIsBiometricAuthenticated(true);
   };
 
-  // --- ESTE É O BLOCO return QUE VOCÊ PEDIU ---
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           !isBiometricAuthenticated ? (
-            // 1. Usuário logado, mas biometria ainda não passou
             <Stack.Screen
               name="AuthLoading"
               component={AuthLoadingScreen}
               initialParams={{ onAuthSuccess: handleAuthSuccess }}
             />
           ) : (
-            // 2. Biometria OK, mostra as telas principais
             <Stack.Group>
               <Stack.Screen name="Main" component={TabNavigator} />
               <Stack.Screen name="AddTask" component={AddTaskScreen} />
+
+              <Stack.Screen name="MapPicker" component={MapPickerScreen} />
             </Stack.Group>
           )
         ) : (
-          // 3. Usuário não logado, mostra as telas de Login E Cadastro
           <Stack.Group>
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />

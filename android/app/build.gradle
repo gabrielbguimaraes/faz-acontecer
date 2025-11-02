@@ -1,3 +1,5 @@
+// FazAcontecer/android/app/build.gradle
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -5,22 +7,11 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
-/**
- * This is the configuration block to customize your React Native Android app.
- * By default you don't need to apply any configuration, just uncomment the lines you need.
- */
 react {
     autolinkLibrariesWithApp()
 }
 
-/**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
- */
 def enableProguardInReleaseBuilds = false
-
-/**
- * The preferred build flavor of JavaScriptCore (JSC)
- */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 android {
@@ -35,10 +26,18 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        // --- CORREÇÃO DO C++ (NDK) ADICIONADA AQUI ---
+        // Isto corrige o erro de 'std::format' que vimos antes,
+        // que é causado por usar o compileSdk 36.
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
+        // -------------------------------------------
     }
 
-    // --- CORREÇÃO APLICADA AQUI ---
-    // Bloco de configuração de assinaturas.
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -46,7 +45,6 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        // Configuração para a versão de lançamento (release)
         release {
             if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
                 storeFile file(MYAPP_RELEASE_STORE_FILE)
@@ -56,21 +54,13 @@ android {
             }
         }
     }
-    // --- FIM DA CORREÇÃO ---
 
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-
-            // --- CORREÇÃO APLICADA AQUI ---
-            // Aponta para a nossa nova configuração de assinatura de release
             signingConfig signingConfigs.release
-            // --- FIM DA CORREÇÃO ---
-            
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -78,14 +68,17 @@ android {
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation platform('com.google.firebase:firebase-bom:34.3.0') // Mantenha esta linha para o BoM
+    implementation platform('com.google.firebase:firebase-bom:34.3.0')
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.firebase:firebase-analytics'
-    // ... e as outras dependências
+    
+    // Dependências de Mapa e GPS
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

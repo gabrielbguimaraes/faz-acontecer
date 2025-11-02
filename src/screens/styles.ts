@@ -58,7 +58,6 @@ export const styles = StyleSheet.create({
         shadowRadius: 1,
         elevation: 2,
     },
-    // ESTILO CORRIGIDO QUE FALTAVA
     taskContent: {
         flex: 1,
         marginRight: spacing.sm,
@@ -98,7 +97,7 @@ export const styles = StyleSheet.create({
     },
     taskTime: {
         fontSize: 12,
-        color: colors.textSecondary,
+        color: colors.textDark,
     },
     checkboxContainer: {
         backgroundColor: 'transparent',

@@ -8,22 +8,54 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CheckBox } from 'react-native-elements';
+import notifee, { TimestampTrigger, TriggerType, AndroidImportance } from '@notifee/react-native'; // Importa Notifee
 
 import { Tarefa } from '../domain/entities/tarefa';
 import { BuscarTarefasDoDiaUseCase } from '../domain/usecases/BuscarTarefasDoDiaUseCase';
 import { ExcluirTarefaUseCase } from '../domain/usecases/ExcluirTarefaUseCase';
 import { MarcarTarefaComoConcluidaUseCase } from '../domain/usecases/MarcarTarefaComoConcluidaUseCase';
+import { CriarTarefaUseCase } from '../domain/usecases/CriarTarefaUseCase'; // <-- Importa o CriarTarefaUseCase
 import { FirebaseTarefaDataSource } from '../data/datasources/FirebaseTarefaDataSource';
 import { colors, spacing } from '../theme';
-import { styles as screenStyles } from './styles'; // Importa estilos de 'styles.ts'
+import { styles as screenStyles } from './styles';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { TabParamList } from '../navigation/TabNavigator';
 
-// INJEÇÃO DE DEPENDÊNCIAS
+
 const firebaseTarefaDataSource = new FirebaseTarefaDataSource();
 const buscarTarefasDoDiaUseCase = new BuscarTarefasDoDiaUseCase(firebaseTarefaDataSource);
 const excluirTarefaUseCase = new ExcluirTarefaUseCase(firebaseTarefaDataSource);
 const marcarTarefaComoConcluidaUseCase = new MarcarTarefaComoConcluidaUseCase(firebaseTarefaDataSource);
+const criarTarefaUseCase = new CriarTarefaUseCase(firebaseTarefaDataSource); 
+
+
+async function scheduleNotification(tarefa: Tarefa) {
+  try {
+    await notifee.requestPermission();
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: tarefa.data_execucao.getTime(),
+    };
+    await notifee.createTriggerNotification(
+      {
+        title: `Hora da Tarefa: ${tarefa.titulo}`,
+        body: tarefa.descricao || 'Está na hora de fazer acontecer!',
+        android: {
+          channelId: 'implacable_alarm',
+          importance: AndroidImportance.HIGH,
+          sound: 'alarm',
+          loopSound: true,
+          fullScreenAction: { id: 'default' },
+          actions: [{ title: 'Confirmar (Parar Alarme)', pressAction: { id: 'confirm' } }],
+        },
+      },
+      trigger,
+    );
+    console.log('[Notifee] Alarme da *próxima* tarefa recorrente agendado com sucesso.');
+  } catch (error) {
+    console.error('[Notifee] Erro ao agendar alarme recorrente:', error);
+  }
+}
 
 const getCurrentTime = () => {
   const now = new Date();
@@ -42,30 +74,38 @@ type TaskItemProps = {
 
 const TaskItem: React.FC<TaskItemProps> = ({ tarefa, onToggle, onDelete }) => {
   const isConcluida = tarefa.concluida;
-
-
   const getPriorityColor = () => {
     switch (tarefa.prioridade) {
-      case 'urgente':
-        return colors.danger;
-      case 'importante':
-        return colors.warning;
-      case 'opcional':
-      default:
-        return colors.primary;
+      case 'urgente': return colors.danger;
+      case 'importante': return colors.warning;
+      case 'opcional': default: return colors.primary;
     }
   };
+  const horaFormatada = tarefa.hora_execucao?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || '';
 
   return (
     <View style={screenStyles.taskItem}>
       <View style={[screenStyles.priorityBar, { backgroundColor: getPriorityColor() }]} />
+      
+      <View style={localStyles.timeContainer}>
+        {tarefa.recorrencia !== 'nao_repete' && (
+          <Icon name="repeat" size={16} color={colors.textDark} style={{ marginBottom: 4 }} />
+        )}
+        <Icon name="alarm" size={16} color={colors.textDark} />
+        <Text style={localStyles.timeText}>{horaFormatada}</Text>
+      </View>
+
       <View style={screenStyles.taskContent}>
         <Text style={[screenStyles.taskTitle, isConcluida && screenStyles.taskTitleCompleted]}>
           {tarefa.titulo}
         </Text>
-        <Text style={screenStyles.taskTime}>
-          {tarefa.hora_execucao?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || ''}
-        </Text>
+        
+        {tarefa.descricao ? (
+          <Text style={localStyles.descriptionText}>
+            {tarefa.descricao}
+          </Text>
+        ) : null}
+
       </View>
       <View style={screenStyles.taskActions}>
         <CheckBox
@@ -82,8 +122,6 @@ const TaskItem: React.FC<TaskItemProps> = ({ tarefa, onToggle, onDelete }) => {
     </View>
   );
 };
-
-
 
 type HomeScreenProps = CompositeScreenProps<
   BottomTabScreenProps<TabParamList, 'HomeTab'>,
@@ -105,7 +143,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     try {
       const today = new Date();
       const loadedTarefas = await buscarTarefasDoDiaUseCase.execute(today);
-      // Ordena as tarefas: Urgente > Importante > Opcional
       const sortedTarefas = loadedTarefas.sort((a, b) => {
         const priorityOrder = { 'urgente': 1, 'importante': 2, 'opcional': 3 };
         return priorityOrder[a.prioridade] - priorityOrder[b.prioridade];
@@ -123,19 +160,75 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     fetchTarefas();
   }, [fetchTarefas]));
 
+  // --- FUNÇÃO DE RECORRÊNCIA ---
+  const handleRecurrence = async (tarefaConcluida: Tarefa) => {
+    if (!tarefaConcluida.recorrencia || tarefaConcluida.recorrencia === 'nao_repete') {
+      return; // Não é recorrente, não faz nada
+    }
+
+    // 1. Calcula a próxima data de vencimento
+    const proximaData = new Date(tarefaConcluida.data_execucao);
+    if (tarefaConcluida.recorrencia === 'diariamente') {
+      proximaData.setDate(proximaData.getDate() + 1);
+    } else if (tarefaConcluida.recorrencia === 'semanalmente') {
+      proximaData.setDate(proximaData.getDate() + 7);
+    }
+
+    // 2. Prepara a nova tarefa
+    const proximaTarefa: Partial<Tarefa> = {
+      ...tarefaConcluida,
+      id_tarefa: undefined, // Remove o ID para o Firebase gerar um novo
+      data_execucao: proximaData,
+      hora_execucao: tarefaConcluida.hora_execucao, // Mantém a mesma hora
+      concluida: false,
+      status: 'pendente',
+    };
+    
+    // Limpa o campo id_tarefa se ele foi copiado
+    delete (proximaTarefa as any).id_tarefa; 
+
+    try {
+      // 3. Cria a nova tarefa no Firebase
+      const tarefaRecriada = await criarTarefaUseCase.execute(proximaTarefa);
+      
+      // 4. Agenda o alarme para a *próxima* tarefa
+      await scheduleNotification(tarefaRecriada);
+      
+    } catch (error) {
+      console.error("Erro ao criar tarefa recorrente:", error);
+      Alert.alert("Erro de Recorrência", "Não foi possível criar a próxima tarefa recorrente.");
+    }
+  };
+  // --- FIM DA FUNÇÃO ---
+
   const handleToggleTask = async (tarefaAtualizada: Tarefa) => {
     const originalTarefas = [...tarefas];
+    
+    // Atualiza a UI imediatamente
     setTarefas(currentTarefas =>
       currentTarefas.map(t =>
         t.id_tarefa === tarefaAtualizada.id_tarefa ? tarefaAtualizada : t
       )
     );
+
     try {
+      // Salva a mudança no Firebase
       await marcarTarefaComoConcluidaUseCase.execute(tarefaAtualizada);
+
+      // --- LÓGICA DE RECORRÊNCIA CHAMADA AQUI ---
+      if (tarefaAtualizada.concluida === true) {
+        // Se a tarefa foi marcada como CONCLUÍDA
+        await handleRecurrence(tarefaAtualizada);
+        
+        // Atualiza a lista para remover a tarefa que acabamos de completar
+        setTarefas(currentTarefas =>
+          currentTarefas.filter(t => t.id_tarefa !== tarefaAtualizada.id_tarefa)
+        );
+      }
     } catch (error) {
       console.error("Erro ao atualizar tarefa:", error);
       Alert.alert("Erro", "Não foi possível atualizar a tarefa.");
-      setTarefas(originalTarefas);
+      setTarefas(originalTarefas); // Reverte a UI em caso de erro
     }
   };
 
@@ -188,7 +281,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       </ScrollView>
     );
   };
-
+  
   return (
     <View style={screenStyles.container}>
       <View style={screenStyles.header}>
@@ -211,23 +304,44 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 };
 
-// Estilos locais para a mensagem de "vazio"
+
 const localStyles = StyleSheet.create({
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingTop: spacing.xl * 2,
-    },
-    emptyText: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: colors.textDark,
-        marginTop: spacing.md,
-    },
-    emptySubText: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        marginTop: spacing.sm,
-    },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: spacing.xl * 2,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.textDark,
+    marginTop: spacing.md,
+  },
+  emptySubText: {
+    fontSize: 14,
+    color: colors.textDark,
+    marginTop: spacing.sm,
+  },
+
+  timeContainer: {
+    width: 60,
+    paddingHorizontal: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRightWidth: 1,
+    borderRightColor: colors.backgroundDark,
+    marginRight: spacing.sm,
+  },
+  timeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.textDark,
+    marginTop: 4, 
+  },
+  descriptionText: {
+    fontSize: 14,
+    color: colors.textDark,
+    marginTop: spacing.xs,
+  },
 });

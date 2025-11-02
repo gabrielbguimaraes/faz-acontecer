@@ -2,11 +2,12 @@
 
 buildscript {
     ext {
+        // --- Voltando para as suas versões que funcionavam ---
         buildToolsVersion = "36.0.0"
-        minSdkVersion = 24
-        compileSdkVersion = 36
+        minSdkVersion = 24           // <-- Mantém a correção do React Native
+        compileSdkVersion = 36       // <-- Define para 36 (como o log pedia)
         targetSdkVersion = 36
-        ndkVersion = "29.0.14033849"
+        ndkVersion = "29.0.14033849" // <-- Sua versão do NDK
         kotlinVersion = "2.1.20"
     }
     repositories {
@@ -14,14 +15,36 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
+        // A sua versão do 'gradle' estava faltando no log, 
+        // mas é provável que seja esta (padrão do RN):
+        classpath("com.android.tools.build:gradle:8.4.1") 
         classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
-        classpath("com.google.gms:google-services:4.4.4")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath('com.google.gms:google-services:4.4.4')
     }
 }
 
-// O bloco plugins {} não deve existir neste arquivo para o seu caso.
-// Mantenha apenas a configuração acima.
+// --- ESTE BLOCO É ESSENCIAL E ESTAVA FALTANDO ---
+allprojects {
+    repositories {
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+        mavenCentral {
+            // We don't want to fetch react-native from Maven Central as there are
+            // older versions over there.
+            content {
+                excludeGroup "com.facebook.react"
+            }
+        }
+        google()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
 
 apply plugin: "com.facebook.react.rootproject"

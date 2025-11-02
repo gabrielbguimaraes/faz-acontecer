@@ -8,7 +8,13 @@ import { CalendarScreen } from '../screens/CalendarScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { colors } from '../theme';
 
-const Tab = createBottomTabNavigator();
+export type TabParamList = {
+  HomeTab: undefined;
+  CalendarTab: undefined;
+  ProfileTab: undefined;
+};
+
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export const TabNavigator = () => {
   return (
@@ -17,14 +23,15 @@ export const TabNavigator = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: colors.surface,
+
+          backgroundColor: colors.backgroundDark,
           borderTopWidth: 0,
           elevation: 0,
         },
         tabBarIcon: ({ color, size, focused }) => {
           let iconName = 'home';
           const activeColor = colors.primary;
-          const inactiveColor = colors.textSecondary;
+          const inactiveColor = colors.textSecondary; 
 
           if (route.name === 'HomeTab') {
             iconName = 'home';
