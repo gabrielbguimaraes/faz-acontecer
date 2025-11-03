@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import auth from '@react-native-firebase/auth';
+import { SettingsScreen } from '../screens/SettingsScreen';
 
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignUpScreen } from '../screens/SignUpScreen/SignUpScreen';
@@ -18,6 +19,7 @@ export type RootStackParamList = {
   SignUp: undefined; 
   AuthLoading: { onAuthSuccess: () => void };
   Main: undefined;
+  Settings: undefined;
   AddTask: undefined;
   // --- 3. ADICIONE A ROTA E SEUS PARÂMETROS ---
   MapPicker: {
@@ -58,9 +60,16 @@ export const AppNavigator = () => {
           ) : (
             <Stack.Group>
               <Stack.Screen name="Main" component={TabNavigator} />
-              <Stack.Screen name="AddTask" component={AddTaskScreen} />
-
+              <Stack.Screen name="AddTask" component={AddTaskScreen} options={{ presentation: 'modal' }} />
               <Stack.Screen name="MapPicker" component={MapPickerScreen} />
+              <Stack.Screen 
+                name="Settings" 
+                component={SettingsScreen} 
+                options={{ 
+                  title: 'Configurações',
+                  presentation: 'modal', 
+                }} 
+              />
             </Stack.Group>
           )
         ) : (
